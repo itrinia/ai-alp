@@ -7,77 +7,137 @@ class KlooDoGame:
         self.master = master
         self.master.title("Kloo-Do Game")
 
-        self.characters = ["Alice", "Bob", "Charlie", "David", "Eve"]
-        self.weapons = ["Knife", "Gun", "Poison", "Rope", "Candlestick"]
-        self.locations = ["Park", "Museum", "Jungle", "Beach", "Library"]
+        self.characters = ["Budi", "Bambang", "Jevon", "Aladdin", "Charlotte"]
+        self.weapons = ["Keris", "Lifebuoy", "Gun", "Carpet", "Bag with Bullets"]
+        self.locations = ["Beach", "Bathroom", "Sea", "Sky", "Bar"]
 
-        self.storyline_count = 3
+        self.storyline_count = 1
         self.current_storyline = 0
+        self.max_incorrect_guesses = 3
+        self.incorrect_guesses = 0
 
         self.create_widgets()
+
+        # Generate the first storyline and clues
+        self.generate_storyline()
+        self.correct_answer = self.get_correct_answer()  # Store the correct answer
 
     def create_widgets(self):
         self.story_label = tk.Label(self.master, text="Storyline")
         self.story_label.pack()
 
-        self.story_text = tk.Text(self.master, height=5, width=50)
+        self.story_text = tk.Text(self.master, height=5, width=80)
         self.story_text.pack()
 
-        self.clue_button = tk.Button(self.master, text="Clue", command=self.show_clue)
+        self.clue_button = tk.Button(self.master, text="Clue", command=self.show_clues)
         self.clue_button.pack()
 
-        self.answer_label = tk.Label(self.master, text="Your Answer:")
-        self.answer_label.pack()
+        self.name_label = tk.Label(self.master, text="Your Guess - Name:")
+        self.name_label.pack()
 
-        self.answer_entry = tk.Entry(self.master)
-        self.answer_entry.pack()
+        self.name_entry = tk.Entry(self.master)
+        self.name_entry.pack()
+
+        self.location_label = tk.Label(self.master, text="Your Guess - Location:")
+        self.location_label.pack()
+
+        self.location_entry = tk.Entry(self.master)
+        self.location_entry.pack()
+
+        self.weapon_label = tk.Label(self.master, text="Your Guess - Weapon:")
+        self.weapon_label.pack()
+
+        self.weapon_entry = tk.Entry(self.master)
+        self.weapon_entry.pack()
 
         self.submit_button = tk.Button(self.master, text="Submit", command=self.check_answer)
         self.submit_button.pack()
 
     def generate_storyline(self):
+        # Ensure the same storyline for a single run
+        random.seed(42)
+
         characters = random.sample(self.characters, 5)
         weapons = random.sample(self.weapons, 5)
         locations = random.sample(self.locations, 5)
 
-        storyline = f"In the {locations[self.current_storyline]},"
-        storyline += f" {characters[0]} was found dead. The possible suspects are {', '.join(characters[1:])}."
-        storyline += f" The weapons found at the scene include {', '.join(weapons)}."
-        storyline += f" Can you solve the mystery?"
+        storyline = f"In the {locations[self.current_storyline]}, there is a murder case. "
+        storyline += f"{characters[0]} was killed and found dead below the coconut tree. "
+        storyline += f"In the {locations[self.current_storyline]}, there are only 5 people:\n"
+        for char, weap in zip(characters[1:], weapons[1:]):
+            storyline += f"{char} is in the {locations[self.characters.index(char)]}, "
+            storyline += f"carrying a {weap} and doing something specific. "
+        storyline += f"{characters[-1]} is in the corner of the {locations[self.current_storyline]}, "
+        storyline += f"carrying a {weapons[-1]} and sleeping."
 
-        self.story_text.insert(tk.END, storyline + "\n\n")
+        self.story_text.insert(tk.END, storyline)
 
-    def show_clue(self):
-        clue = self.generate_clue()
-        messagebox.showinfo("Clue", f"Crossword Clue:\n{clue}")
+    def show_clues(self):
+        actor_clue = self.generate_clue(self.characters[0])
+        location_clue = self.generate_clue(self.locations[self.current_storyline])
+        weapon_clue = self.generate_clue(self.weapons[0])
 
-    def generate_clue(self):
-        # Implement logic to generate a crossword puzzle clue
-        pass
+        messagebox.showinfo("Clues", f"Clue for Actor:\n{actor_clue}\n\nClue for Location:\n{location_clue}\n\nClue for Weapon:\n{weapon_clue}")
+
+    def generate_clue(self, correct_answer):
+        # Create a grid for the crossword puzzle
+        grid_size = (10, 10)
+        grid = [[' ' for _ in range(grid_size[1])] for _ in range(grid_size[0])]
+
+        # Ensure the range for start_row is valid
+        max_start_row = max(0, grid_size[0] - len(correct_answer))
+        start_row = random.randint(0, max_start_row)
+
+        # Embed the correct answer into the grid
+        start_col = random.randint(0, grid_size[1] - len(correct_answer))
+        for i, char in enumerate(correct_answer):
+            grid[start_row + i][start_col] = char
+
+        # Fill the remaining grid with random alphabets
+        for row in range(grid_size[0]):
+            for col in range(grid_size[1]):
+                if grid[row][col] == ' ':
+                    grid[row][col] = random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+
+        # Convert the grid to a string
+        clue_text = '\n'.join([' '.join(row) for row in grid])
+
+        return clue_text
 
     def check_answer(self):
-        answer = self.answer_entry.get().lower()
-        correct_answer = self.get_correct_answer()
+        name_guess = self.name_entry.get().lower()
+        location_guess = self.location_entry.get().lower()
+        weapon_guess = self.weapon_entry.get().lower()
 
-        if answer == correct_answer:
+        if name_guess == self.characters[0].lower() and \
+           location_guess == self.locations[self.current_storyline].lower() and \
+           weapon_guess == self.weapons[0].lower():
             messagebox.showinfo("Correct", "Congratulations! You solved the mystery.")
+            self.reset_game()
         else:
-            messagebox.showinfo("Incorrect", "Sorry, your answer is incorrect. Keep investigating!")
+            self.incorrect_guesses += 1
+            if self.incorrect_guesses >= self.max_incorrect_guesses:
+                messagebox.showinfo("Game Over", f"Sorry, you've reached the maximum incorrect guesses.\n"
+                                                 f"The correct answer is: {self.correct_answer}")
+                self.reset_game()
+            else:
+                messagebox.showinfo("Incorrect", "Sorry, your answer is incorrect. Keep investigating!")
 
-        self.current_storyline += 1
-        if self.current_storyline < self.storyline_count:
-            self.generate_storyline()
-        else:
-            messagebox.showinfo("Game Over", "All storylines completed. Thanks for playing!")
+    def reset_game(self):
+        self.story_text.delete(1.0, tk.END)
+        self.current_storyline = 0
+        self.incorrect_guesses = 0
+        self.generate_storyline()
+        self.correct_answer = self.get_correct_answer()  # Store the correct answer
 
     def get_correct_answer(self):
         # Implement logic to retrieve the correct answer for the current storyline
-        pass
+        # For simplicity, let's just return a placeholder
+        return f"{self.characters[1]} {self.locations[self.current_storyline]} {self.weapons[0]}"  # Corrected answer
 
 def main():
     root = tk.Tk()
     game = KlooDoGame(root)
-    game.generate_storyline()
     root.mainloop()
 
 if __name__ == "__main__":
