@@ -56,12 +56,12 @@ class KlooDoGame:
     def generate_storyline(self):
         # Clear the existing storyline
         self.story_text.delete(1.0, tk.END)
-        # Ensure the same storyline for a single run
-        random.seed(42)
 
         characters = random.sample(self.characters, 5)
         weapons = random.sample(self.weapons, 5)
         locations = random.sample(self.locations, 5)
+
+        self.correct_answer = f"{characters[0]} {locations[self.current_storyline]} {weapons[0]}"  # Set the correct answer
 
         storyline = f"In the {locations[self.current_storyline]}, there is a murder case. "
         storyline += f"{characters[0]} was killed and found dead below the coconut tree. "
@@ -142,9 +142,7 @@ class KlooDoGame:
         self.correct_answer = self.get_correct_answer()  # Store the correct answer
 
     def get_correct_answer(self):
-        # Implement logic to retrieve the correct answer for the current storyline
-        # For simplicity, let's just return a placeholder
-        return f"{self.characters[1]} {self.locations[self.current_storyline]} {self.weapons[0]}"  # Corrected answer
+         return self.correct_answer
 
 def main():
     root = tk.Tk()
