@@ -7,9 +7,15 @@ class KlooDoGame:
         self.master = master
         self.master.title("Kloo-Do Game")
 
-        self.characters = ["Budi", "Bambang", "Jevon", "Aladdin", "Charlotte"]
-        self.weapons = ["Keris", "Lifebuoy", "Gun", "Carpet", "Bag with Bullets"]
-        self.locations = ["Beach", "Bathroom", "Sea", "Sky", "Bar"]
+        # Set the initial window size
+        self.master.geometry("800x400")
+        # Allow both width and height to be resizable
+        self.master.resizable(width=True, height=True)
+
+        self.original_characters = ["Budi", "Bambang", "Jevon", "Aladdin", "Charlotte"]
+        self.original_weapons = ["Keris", "Lifebuoy", "Gun", "Carpet", "Bag with Bullets"]
+        self.original_locations = ["Beach", "Bathroom", "Sea", "Sky", "Bar"]
+        self.actions = ["Massaging", "Party", "Sleeping", "Sweeping", "Singing"]
 
         self.storyline_count = 1
         self.current_storyline = 0
@@ -26,7 +32,7 @@ class KlooDoGame:
         self.story_label = tk.Label(self.master, text="Storyline")
         self.story_label.pack()
 
-        self.story_text = tk.Text(self.master, height=5, width=80)
+        self.story_text = tk.Text(self.master, height=10, width=100)
         self.story_text.pack()
 
         self.clue_button = tk.Button(self.master, text="Clue", command=self.show_clues)
@@ -57,20 +63,30 @@ class KlooDoGame:
         # Clear the existing storyline
         self.story_text.delete(1.0, tk.END)
 
-        characters = random.sample(self.characters, 5)
+        # Reset the characters, locations, and weapons lists to their original state
+        self.characters = self.original_characters.copy()
+        self.weapons = self.original_weapons.copy()
+        self.locations = self.original_locations.copy()
+
+        # Randomly select the killed character from the list
+        victim = random.choice(self.characters)
+        self.characters.remove(victim)  # Remove the killed character from the list
+
         weapons = random.sample(self.weapons, 5)
         locations = random.sample(self.locations, 5)
+        actions = random.sample(self.actions, 5)
 
-        self.correct_answer = f"{characters[0]} {locations[self.current_storyline]} {weapons[0]}"  # Set the correct answer
+        self.correct_answer = f"{victim} {locations[self.current_storyline]} {weapons[0]}"  # Set the correct answer
 
-        storyline = f"In the {locations[self.current_storyline]}, there is a murder case. "
-        storyline += f"{characters[0]} was killed and found dead below the coconut tree. "
-        storyline += f"In the {locations[self.current_storyline]}, there are only 5 people:\n"
-        for char, weap in zip(characters[1:], weapons[1:]):
-            storyline += f"{char} is in the {locations[self.characters.index(char)]}, "
-            storyline += f"carrying a {weap} and doing something specific. "
-        storyline += f"{characters[-1]} is in the corner of the {locations[self.current_storyline]}, "
-        storyline += f"carrying a {weapons[-1]} and sleeping."
+        storyline = f"{victim} is killed below the coconut tree and a {weapons[0]} is found beside him. "
+        storyline += f"The characters at that place:\n"
+        
+        # Print the killed character separately
+        storyline += f"- {victim} is killed 1 meter from the murder location in {locations[self.current_storyline]}.\n"
+
+        # Assign random actions and locations to other characters
+        for char, act, weap, loc in zip(self.characters, actions, weapons, locations):
+            storyline += f"- {char} is {act} and bringing {weap} 20 meters from the murder location in {loc}.\n"
 
         self.story_text.insert(tk.END, storyline)
 
@@ -113,8 +129,6 @@ class KlooDoGame:
 
         return clue_text
 
-
-
     def check_answer(self):
         name_guess = self.name_entry.get().lower()
         location_guess = self.location_entry.get().lower()
@@ -139,10 +153,10 @@ class KlooDoGame:
         self.current_storyline = 0
         self.incorrect_guesses = 0
         self.generate_storyline()
-        self.correct_answer = self.get_correct_answer()  # Store the correct answer
+        self.correct_answer = self.get_correct_answer()  
 
     def get_correct_answer(self):
-         return self.correct_answer
+        return self.correct_answer
 
 def main():
     root = tk.Tk()
