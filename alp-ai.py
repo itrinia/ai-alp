@@ -16,6 +16,7 @@ class KlooDoGame:
         self.original_weapons = ["Keris", "Lifebuoy", "Gun", "Carpet", "Bag with Bullets"]
         self.original_locations = ["Beach", "Bathroom", "Sea", "Sky", "Bar"]
         self.actions = ["Massaging", "Party", "Sleeping", "Sweeping", "Singing"]
+        self.distance = ["10", "500", "3", "100", "20"]
 
         self.storyline_count = 1
         self.current_storyline = 0
@@ -72,23 +73,31 @@ class KlooDoGame:
         victim = random.choice(self.characters)
         self.characters.remove(victim)  # Remove the killed character from the list
 
-        weapons = random.sample(self.weapons, 5)
-        locations = random.sample(self.locations, 5)
-        actions = random.sample(self.actions, 5)
+        # Randomly select the killer from the remaining characters
+        random.shuffle(self.characters)
 
-        self.correct_answer = f"{victim} {locations[self.current_storyline]} {weapons[0]}"  # Set the correct answer
+        # Ensure the killed character is not the first one in the shuffled list
+        if self.characters[0] == victim:
+            self.characters[0], self.characters[1] = self.characters[1], self.characters[0]
 
-        storyline = f"{victim} is killed below the coconut tree and a {weapons[0]} is found beside him. "
-        storyline += f"The characters at that place:\n"
-        
-        # Print the killed character separately
-        storyline += f"- {victim} is killed 1 meter from the murder location in {locations[self.current_storyline]}.\n"
+        killer = self.characters[0]
+
+        # Shuffle weapons and locations
+        random.shuffle(self.weapons)
+        random.shuffle(self.locations)
+
+        self.correct_answer = f"{killer} {self.locations[self.current_storyline]} {self.weapons[0]}"  # Set the correct answer
+
+        storyline = f"{victim} is killed at the {self.locations[1]} and a {self.weapons[1]} is found beside him. "
+        storyline += f"\nThe characters at that place:\n"
 
         # Assign random actions and locations to other characters
-        for char, act, weap, loc in zip(self.characters, actions, weapons, locations):
-            storyline += f"- {char} is {act} and bringing {weap} 20 meters from the murder location in {loc}.\n"
+        for char, act, weap, loc, dist in zip(self.characters, self.actions, self.weapons[1:], self.locations[1:], self.distance[1:]):
+            storyline += f"- {char} is {act} and bringing {weap} {dist} meters from the murder location in {loc}.\n"
+
 
         self.story_text.insert(tk.END, storyline)
+
 
     def show_clues(self):
         # Pass correct answers for each clue
