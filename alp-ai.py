@@ -161,31 +161,33 @@ class KlooDoGame:
         location_guess = self.location_entry.get().lower()
         weapon_guess = self.weapon_entry.get().lower()
 
+        # Check if any of the guess boxes is empty
+        if not name_guess or not location_guess or not weapon_guess:
+            messagebox.showinfo("Error", "Please fill in all guess boxes.")
+            return
+
         if name_guess == self.characters[0].lower() and \
                 location_guess == self.locations[self.current_storyline].lower() and \
                 weapon_guess == self.weapons[0].lower():
             self.user_score += 1
-            self.update_score_display()  # Move the update_score_display() call here
+            self.update_score_display()
             messagebox.showinfo("Correct", "Congratulations! You solved the mystery. You got 1 score!")
 
-            # If the user has reached a score of 3 or it's the last storyline, end the game
             if self.user_score >= 3 or self.current_storyline == len(self.original_locations) - 1:
                 self.end_game()
             else:
-                # Move to the next storyline
                 self.current_storyline += 1
                 self.generate_storyline()
-                # Directly set the correct_answer attribute based on the current storyline
                 self.correct_answer = f"The Killer: {self.characters[0]}\nThe location: {self.locations[self.current_storyline]}\nThe weapon: {self.weapons[0]}\n"
         else:
             self.incorrect_guesses += 1
             if self.incorrect_guesses >= self.max_incorrect_guesses:
                 self.system_score += 1
-                self.update_score_display()  # Add this line to update the score display
+                self.update_score_display()
                 messagebox.showinfo("Game Over", f"Sorry, you've reached the maximum incorrect guesses.\n"
                                                 f"The correct answer is:\n {self.correct_answer}\n The system got 1 score! You defeated :p")
                 self.reset_game()
-            elif is_submit:  # Check if it's a submit action
+            elif is_submit:
                 messagebox.showinfo("Incorrect", "Sorry, your answer is incorrect. Keep investigating!")
 
     def end_game(self):
@@ -197,31 +199,29 @@ class KlooDoGame:
 
     def reset_game(self):
         self.story_text.delete(1.0, tk.END)
-        self.incorrect_guesses = 0  # Reset the incorrect guesses to zero
+        self.incorrect_guesses = 0
 
-        # Check if the user has reached a score of 3
         if self.user_score >= 3:
             messagebox.showinfo("Game Over", "Congratulations! You are the winner with a score of 3.")
-            self.master.destroy()  # Close the application when the game is over
-        elif self.system_score >= 3:  # Check if the system has reached a score of 3
+            self.master.destroy()
+        elif self.system_score >= 3:
             messagebox.showinfo("Game Over", "Sorry, the system is the winner with a score of 3.")
-            self.master.destroy()  # Close the application when the game is over
-        else:  # Check if the game should continue or if someone has won
+            self.master.destroy()
+        else:
             if self.user_score < 3 and self.system_score < 3 and self.current_storyline < len(self.original_locations) - 1:
-                self.current_storyline += 1  # Move to the next storyline
+                self.current_storyline += 1
                 self.generate_storyline()
-                # Directly set the correct_answer attribute based on the current storyline
                 self.correct_answer = f"The Killer: {self.characters[0]}\nThe location: {self.locations[self.current_storyline]}\nThe weapon: {self.weapons[0]}"
             elif self.user_score < 3 and self.system_score < 3 and self.current_storyline == len(self.original_locations) - 1:
                 self.generate_storyline()
-                # Directly set the correct_answer attribute based on the current storyline
                 self.correct_answer = f"The Killer: {self.characters[0]}\nThe location: {self.locations[self.current_storyline]}\nThe weapon: {self.weapons[0]}\n"
             else:
                 messagebox.showinfo("Game Over", "Game over! It's a draw.")
-                self.master.destroy()  # Close the application when the game is over
+                self.master.destroy()
 
     def update_score_display(self):
-        self.score_label.config(text=f"User Score: {self.user_score} | System Score: {self.system_score}", font=("Helvetica", 12, "italic"))
+        self.score_label.config(text=f"User Score: {self.user_score} | System Score: {self.system_score}",
+                                font=("Helvetica", 12, "italic"))
 
 
 def main():
