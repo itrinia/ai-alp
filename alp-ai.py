@@ -19,9 +19,6 @@ class KlooDoGame:
         self.actions = ["Massaging", "Party", "Sleeping", "Sweeping", "Singing"]
         self.distance = ["10", "500", "3", "100", "20"]
 
-        # Shuffle the characters once at the beginning of the game
-        self.shuffle_characters()
-
         # Add the characters attribute
         self.characters = self.original_characters.copy()
         self.storyline_count = 1
@@ -91,12 +88,12 @@ class KlooDoGame:
         # Reset characters in each storyline
         self.characters = self.original_characters.copy()
 
+        # Shuffle characters before each storyline
+        self.shuffle_characters()
+
         # Randomly select the killed character from the list
         victim = random.choice(self.characters)
         self.characters.remove(victim)  # Remove the killed character from the list
-
-        # Shuffle characters after removing the killed one
-        self.shuffle_characters()
 
         # Randomly select the killer from the shuffled list
         killer = random.choice(self.characters)  # Select a random character as the killer
