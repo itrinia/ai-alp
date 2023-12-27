@@ -9,7 +9,7 @@ class KlooDoGame:
         self.master.title("Kloo-Do Game")
 
         # Set the initial window size
-        self.master.geometry("800x400")
+        self.master.geometry("800x500")
         # Allow both width and height to be resizable
         self.master.resizable(width=True, height=True)
 
@@ -33,45 +33,47 @@ class KlooDoGame:
         # Generate the first storyline and clues
         self.generate_storyline()
         # Directly set the correct_answer attribute based on the current storyline
-        self.correct_answer = f"The Killer: {self.characters[0]}\nThe location: {self.locations[self.current_storyline]}\n The weapon: {self.weapons[0]}\n "
+        self.correct_answer = f"The Killer: {self.characters[0]}\nThe location: {self.locations[self.current_storyline]}\nThe weapon: {self.weapons[0]}\n"
 
         # Update the score display initially
         self.update_score_display()
 
     def create_widgets(self):
-        self.story_label = tk.Label(self.master, text="Storyline")
-        self.story_label.pack()
+        self.story_label = tk.Label(self.master, text="Storyline", font=("Helvetica", 16, "bold"))
+        self.story_label.pack(pady=10)
 
-        self.story_text = tk.Text(self.master, height=10, width=100)
-        self.story_text.pack()
+        self.story_text = tk.Text(self.master, height=8, width=80, wrap=tk.WORD, font=("Helvetica", 12))
+        self.story_text.pack(pady=10)
 
-        self.clue_button = tk.Button(self.master, text="Clue", command=self.show_clues)
-        self.clue_button.pack()
+        self.clue_button = tk.Button(self.master, text="Clue", command=self.show_clues, font=("Helvetica", 12))
+        self.clue_button.pack(pady=5)
 
-        self.name_label = tk.Label(self.master, text="Your Guess - Name:")
+        self.name_label = tk.Label(self.master, text="Your Guess - Name:", font=("Helvetica", 12))
         self.name_label.pack()
 
-        self.name_entry = tk.Entry(self.master)
-        self.name_entry.pack()
+        self.name_entry = tk.Entry(self.master, font=("Helvetica", 12))
+        self.name_entry.pack(pady=5)
 
-        self.location_label = tk.Label(self.master, text="Your Guess - Location:")
+        self.location_label = tk.Label(self.master, text="Your Guess - Location:", font=("Helvetica", 12))
         self.location_label.pack()
 
-        self.location_entry = tk.Entry(self.master)
-        self.location_entry.pack()
+        self.location_entry = tk.Entry(self.master, font=("Helvetica", 12))
+        self.location_entry.pack(pady=5)
 
-        self.weapon_label = tk.Label(self.master, text="Your Guess - Weapon:")
+        self.weapon_label = tk.Label(self.master, text="Your Guess - Weapon:", font=("Helvetica", 12))
         self.weapon_label.pack()
 
-        self.weapon_entry = tk.Entry(self.master)
-        self.weapon_entry.pack()
+        self.weapon_entry = tk.Entry(self.master, font=("Helvetica", 12))
+        self.weapon_entry.pack(pady=5)
 
         # Modify the 'Submit' button to use functools.partial
-        self.submit_button = tk.Button(self.master, text="Submit", command=functools.partial(self.check_answer, True))
-        self.submit_button.pack()
+        self.submit_button = tk.Button(self.master, text="Submit", command=functools.partial(self.check_answer, True),
+                                       font=("Helvetica", 12, "bold"))
+        self.submit_button.pack(pady=10)
 
-        self.score_label = tk.Label(self.master, text=f"User Score: {self.user_score} | System Score: {self.system_score}")
-        self.score_label.pack()
+        self.score_label = tk.Label(self.master, text=f"User Score: {self.user_score} | System Score: {self.system_score}",
+                                    font=("Helvetica", 12, "italic"))
+        self.score_label.pack(pady=10)
 
     def shuffle_characters(self):
         # Shuffle the characters once before each game
@@ -96,8 +98,8 @@ class KlooDoGame:
         self.characters.remove(victim)  # Remove the killed character from the list
 
         # Randomly select the killer from the shuffled list
-        killer = self.characters
-        weapon = self.weapons
+        killer = self.characters[0]
+        weapon = self.weapons[0]
 
         # Shuffle weapons and locations
         random.shuffle(self.weapons)
@@ -113,7 +115,7 @@ class KlooDoGame:
         self.story_text.insert(tk.END, storyline)
 
         # Set the correct answer after shuffling (move this line here)
-        self.correct_answer = f"The Killer: {killer}\n The location: {self.locations[self.current_storyline]}\nThe weapon: {weapon}\n"
+        self.correct_answer = f"The Killer: {killer}\nThe location: {self.locations[self.current_storyline]}\nThe weapon: {weapon}\n"
 
     def show_clues(self):
         # Pass correct answers for each clue
@@ -174,7 +176,7 @@ class KlooDoGame:
                 self.current_storyline += 1
                 self.generate_storyline()
                 # Directly set the correct_answer attribute based on the current storyline
-                self.correct_answer = f"The Killer: {self.characters[0]}\n The location: {self.locations[self.current_storyline]}\nThe weapon: {self.weapons[0]}\n "
+                self.correct_answer = f"The Killer: {self.characters[0]}\nThe location: {self.locations[self.current_storyline]}\nThe weapon: {self.weapons[0]}\n"
         else:
             self.incorrect_guesses += 1
             if self.incorrect_guesses >= self.max_incorrect_guesses:
@@ -209,17 +211,17 @@ class KlooDoGame:
                 self.current_storyline += 1  # Move to the next storyline
                 self.generate_storyline()
                 # Directly set the correct_answer attribute based on the current storyline
-                self.correct_answer = f"The Killer: {self.characters[0]}\n The location: {self.locations[self.current_storyline]}\nThe weapon: {self.weapons[0]}"
+                self.correct_answer = f"The Killer: {self.characters[0]}\nThe location: {self.locations[self.current_storyline]}\nThe weapon: {self.weapons[0]}"
             elif self.user_score < 3 and self.system_score < 3 and self.current_storyline == len(self.original_locations) - 1:
                 self.generate_storyline()
                 # Directly set the correct_answer attribute based on the current storyline
-                self.correct_answer = f"The Killer: {self.characters[0]}\n The location: {self.locations[self.current_storyline]}\nThe weapon: {self.weapons[0]}\n "
+                self.correct_answer = f"The Killer: {self.characters[0]}\nThe location: {self.locations[self.current_storyline]}\nThe weapon: {self.weapons[0]}\n"
             else:
                 messagebox.showinfo("Game Over", "Game over! It's a draw.")
                 self.master.destroy()  # Close the application when the game is over
 
     def update_score_display(self):
-        self.score_label.config(text=f"User Score: {self.user_score} | System Score: {self.system_score}")
+        self.score_label.config(text=f"User Score: {self.user_score} | System Score: {self.system_score}", font=("Helvetica", 12, "italic"))
 
 
 def main():
