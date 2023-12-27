@@ -96,8 +96,8 @@ class KlooDoGame:
         self.characters.remove(victim)  # Remove the killed character from the list
 
         # Randomly select the killer from the shuffled list
-        killer = random.choice(self.characters)  # Select a random character as the killer
-        weapon = self.weapons[0]
+        killer = self.characters
+        weapon = self.weapons
 
         # Shuffle weapons and locations
         random.shuffle(self.weapons)
