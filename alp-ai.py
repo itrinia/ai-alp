@@ -125,36 +125,38 @@ class KlooDoGame:
 
         messagebox.showinfo("Clues", f"Clue for Actor:\n{actor_clue}\n\nClue for Location:\n{location_clue}\n\nClue for Weapon:\n{weapon_clue}")
 
+    # start TTS
     def generate_clue(self, correct_answer):
-        # Convert the correct answer to uppercase
+    # Convert the correct answer to uppercase
         correct_answer = correct_answer.upper()
 
-        # Create a grid for the crossword puzzle
+    # Create a grid for the crossword puzzle
         grid_size = (10, 10)
         grid = [[' ' for _ in range(grid_size[1])] for _ in range(grid_size[0])]
 
-        # Ensure the range for start_row is valid
+    # Ensure the range for start_row is valid
         max_start_row = max(0, grid_size[0] - len(correct_answer))
         start_row = random.randint(0, max_start_row)
 
-        # Ensure the range for start_col is valid
+    # Ensure the range for start_col is valid
         max_start_col = max(0, grid_size[1] - len(correct_answer))
         start_col = random.randint(0, max_start_col)
 
-        # Embed the correct answer into the grid horizontally
+    # Embed the correct answer into the grid horizontally
         for i, char in enumerate(correct_answer):
             grid[start_row][start_col + i] = char
 
-        # Fill the remaining grid with random alphabets
+    # Fill the remaining grid with random alphabets
         for row in range(grid_size[0]):
             for col in range(grid_size[1]):
                 if grid[row][col] == ' ':
                     grid[row][col] = random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
 
-        # Convert the grid to a string
+    # Convert the grid to a string
         clue_text = '\n'.join([' '.join(row) for row in grid])
 
         return clue_text
+
 
     def check_answer(self, is_submit):
         name_guess = self.name_entry.get().lower()
