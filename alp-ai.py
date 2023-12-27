@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import random
+import functools
 
 class KlooDoGame:
     def __init__(self, master):
@@ -19,9 +20,9 @@ class KlooDoGame:
         self.distance = ["10", "500", "3", "100", "20"]
 
         # Shuffle the characters once at the beginning of the game
-        random.shuffle(self.original_characters)
+        self.shuffle_characters()
 
-         # Add the characters attribute
+        # Add the characters attribute
         self.characters = self.original_characters.copy()
         self.storyline_count = 1
         self.current_storyline = 0
@@ -35,11 +36,11 @@ class KlooDoGame:
         # Generate the first storyline and clues
         self.generate_storyline()
         # Directly set the correct_answer attribute based on the current storyline
-        self.correct_answer = f"The Killer: {self.characters[0]}\n The weapon: {self.weapons[0]}\n The location: {self.locations[self.current_storyline]}"
+        self.correct_answer = f"The Killer: {self.characters[0]}\nThe location: {self.locations[self.current_storyline]}\n The weapon: {self.weapons[0]}\n "
 
         # Update the score display initially
         self.update_score_display()
-    
+
     def create_widgets(self):
         self.story_label = tk.Label(self.master, text="Storyline")
         self.story_label.pack()
@@ -68,11 +69,16 @@ class KlooDoGame:
         self.weapon_entry = tk.Entry(self.master)
         self.weapon_entry.pack()
 
-        self.submit_button = tk.Button(self.master, text="Submit", command=self.check_answer)
+        # Modify the 'Submit' button to use functools.partial
+        self.submit_button = tk.Button(self.master, text="Submit", command=functools.partial(self.check_answer, True))
         self.submit_button.pack()
 
         self.score_label = tk.Label(self.master, text=f"User Score: {self.user_score} | System Score: {self.system_score}")
         self.score_label.pack()
+
+    def shuffle_characters(self):
+        # Shuffle the characters once before each game
+        random.shuffle(self.original_characters)
 
     def generate_storyline(self):
         # Clear the existing storyline
@@ -82,15 +88,18 @@ class KlooDoGame:
         self.weapons = self.original_weapons.copy()
         self.locations = self.original_locations.copy()
 
-        # Add this line to reset characters in each storyline
+        # Reset characters in each storyline
         self.characters = self.original_characters.copy()
 
         # Randomly select the killed character from the list
         victim = random.choice(self.characters)
         self.characters.remove(victim)  # Remove the killed character from the list
 
+        # Shuffle characters after removing the killed one
+        self.shuffle_characters()
+
         # Randomly select the killer from the shuffled list
-        killer = self.characters[0]
+        killer = random.choice(self.characters)  # Select a random character as the killer
         weapon = self.weapons[0]
 
         # Shuffle weapons and locations
@@ -107,21 +116,18 @@ class KlooDoGame:
         self.story_text.insert(tk.END, storyline)
 
         # Set the correct answer after shuffling (move this line here)
-        self.correct_answer = f"The Killer: {killer}\n The weapon: {weapon}\n The location: {self.locations[self.current_storyline]}"
-
-
+        self.correct_answer = f"The Killer: {killer}\n The location: {self.locations[self.current_storyline]}\nThe weapon: {weapon}\n"
 
     def show_clues(self):
         # Pass correct answers for each clue
-        actor_clue = self.generate_clue(self.original_characters[0])
+        actor_clue = self.generate_clue(self.characters[0])
         location_clue = self.generate_clue(self.locations[self.current_storyline])
         weapon_clue = self.generate_clue(self.weapons[0])
 
         messagebox.showinfo("Clues", f"Clue for Actor:\n{actor_clue}\n\nClue for Location:\n{location_clue}\n\nClue for Weapon:\n{weapon_clue}")
 
-
     def generate_clue(self, correct_answer):
-       # Convert the correct answer to uppercase
+        # Convert the correct answer to uppercase
         correct_answer = correct_answer.upper()
 
         # Create a grid for the crossword puzzle
@@ -151,7 +157,7 @@ class KlooDoGame:
 
         return clue_text
 
-    def check_answer(self):
+    def check_answer(self, is_submit):
         name_guess = self.name_entry.get().lower()
         location_guess = self.location_entry.get().lower()
         weapon_guess = self.weapon_entry.get().lower()
@@ -162,6 +168,16 @@ class KlooDoGame:
             self.user_score += 1
             self.update_score_display()  # Move the update_score_display() call here
             messagebox.showinfo("Correct", "Congratulations! You solved the mystery. You got 1 score!")
+
+            # If the user has reached a score of 3 or it's the last storyline, end the game
+            if self.user_score >= 3 or self.current_storyline == len(self.original_locations) - 1:
+                self.end_game()
+            else:
+                # Move to the next storyline
+                self.current_storyline += 1
+                self.generate_storyline()
+                # Directly set the correct_answer attribute based on the current storyline
+                self.correct_answer = f"The Killer: {self.characters[0]}\n The location: {self.locations[self.current_storyline]}\nThe weapon: {self.weapons[0]}\n "
         else:
             self.incorrect_guesses += 1
             if self.incorrect_guesses >= self.max_incorrect_guesses:
@@ -170,26 +186,40 @@ class KlooDoGame:
                 messagebox.showinfo("Game Over", f"Sorry, you've reached the maximum incorrect guesses.\n"
                                                 f"The correct answer is:\n {self.correct_answer}\n The system got 1 score! You defeated :p")
                 self.reset_game()
-            else:
+            elif is_submit:  # Check if it's a submit action
                 messagebox.showinfo("Incorrect", "Sorry, your answer is incorrect. Keep investigating!")
 
+    def end_game(self):
+        if self.user_score >= 3:
+            messagebox.showinfo("Game Over", "Congratulations! You are the winner with a score of 3.")
+        else:
+            messagebox.showinfo("Game Over", "Game over! It's a draw.")
+        self.master.destroy()  # Close the application when the game is over
 
     def reset_game(self):
         self.story_text.delete(1.0, tk.END)
         self.incorrect_guesses = 0  # Reset the incorrect guesses to zero
-        self.current_storyline += 1  # Move to the next storyline
 
-        # Check if the game should continue or if someone has won
-        if self.user_score < 3 and self.system_score < 3 and self.current_storyline < len(self.original_locations):
-            self.generate_storyline()
-            # Directly set the correct_answer attribute based on the current storyline
-            self.correct_answer = f"The Killer: {self.characters[0]}\n The weapon: {self.weapons[0]}\n The location: {self.locations[self.current_storyline]}"
-        else:
-            winner = "User" if self.user_score >= 3 else "System"
-            self.system_score += 1  # Increment system score before displaying the final score
-            self.update_score_display()  # Add this line to update the score display
-            messagebox.showinfo("Game Over", f"Game over! {winner} is the winner with a score of 3.")
+        # Check if the user has reached a score of 3
+        if self.user_score >= 3:
+            messagebox.showinfo("Game Over", "Congratulations! You are the winner with a score of 3.")
             self.master.destroy()  # Close the application when the game is over
+        elif self.system_score >= 3:  # Check if the system has reached a score of 3
+            messagebox.showinfo("Game Over", "Sorry, the system is the winner with a score of 3.")
+            self.master.destroy()  # Close the application when the game is over
+        else:  # Check if the game should continue or if someone has won
+            if self.user_score < 3 and self.system_score < 3 and self.current_storyline < len(self.original_locations) - 1:
+                self.current_storyline += 1  # Move to the next storyline
+                self.generate_storyline()
+                # Directly set the correct_answer attribute based on the current storyline
+                self.correct_answer = f"The Killer: {self.characters[0]}\n The location: {self.locations[self.current_storyline]}\nThe weapon: {self.weapons[0]}"
+            elif self.user_score < 3 and self.system_score < 3 and self.current_storyline == len(self.original_locations) - 1:
+                self.generate_storyline()
+                # Directly set the correct_answer attribute based on the current storyline
+                self.correct_answer = f"The Killer: {self.characters[0]}\n The location: {self.locations[self.current_storyline]}\nThe weapon: {self.weapons[0]}\n "
+            else:
+                messagebox.showinfo("Game Over", "Game over! It's a draw.")
+                self.master.destroy()  # Close the application when the game is over
 
     def update_score_display(self):
         self.score_label.config(text=f"User Score: {self.user_score} | System Score: {self.system_score}")
