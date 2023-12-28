@@ -76,28 +76,36 @@ class KlooDoGame:
         self.score_label.pack(pady=10)
 
     def shuffle_characters(self):
-        # Shuffle the characters once before each game
+    # Shuffle the characters, weapons, and locations once before each game
         random.shuffle(self.original_characters)
+        random.shuffle(self.original_weapons)
+        random.shuffle(self.original_locations)
+
+    # Find the index of the killed character in the original list
+        victim_index = self.original_characters.index(self.characters[0])
+
+    # Move the killed character to a random position in the list
+        random_position = random.randint(0, len(self.original_characters) - 1)
+        self.original_characters.insert(random_position, self.original_characters.pop(victim_index))
+
+    # Reset characters attribute to the shuffled list
+        self.characters = self.original_characters.copy()
+        self.weapons = self.original_weapons.copy()
+        self.locations = self.original_locations.copy()
+
 
     def generate_storyline(self):
     # Clear the existing storyline
         self.story_text.delete(1.0, tk.END)
 
-    # Reset the locations and weapons lists to their original state
-        self.weapons = self.original_weapons.copy()
-        self.locations = self.original_locations.copy()
-
-    # Reset characters in each storyline
-        self.characters = self.original_characters.copy()
-
-    # Shuffle characters before each storyline
+    # Shuffle characters, weapons, and locations before each storyline
         self.shuffle_characters()
 
     # Randomly select the killed character from the list
         victim = random.choice(self.characters)
         self.characters.remove(victim)  # Remove the killed character from the list
 
-    # Randomly select the killer from the shuffled list
+    # Set the killer as the first character in the list
         killer = self.characters[0]
         weapon = self.weapons[0]
 
@@ -121,6 +129,7 @@ class KlooDoGame:
         self.name_entry.delete(0, tk.END)
         self.location_entry.delete(0, tk.END)
         self.weapon_entry.delete(0, tk.END)
+
 
 
 
