@@ -80,42 +80,43 @@ class KlooDoGame:
         random.shuffle(self.original_characters)
 
     def generate_storyline(self):
-        # Clear the existing storyline
+    # Clear the existing storyline
         self.story_text.delete(1.0, tk.END)
 
-        # Reset the locations and weapons lists to their original state
+    # Reset the locations and weapons lists to their original state
         self.weapons = self.original_weapons.copy()
         self.locations = self.original_locations.copy()
 
-        # Reset characters in each storyline
+    # Reset characters in each storyline
         self.characters = self.original_characters.copy()
 
-        # Shuffle characters before each storyline
+    # Shuffle characters before each storyline
         self.shuffle_characters()
 
-        # Randomly select the killed character from the list
+    # Randomly select the killed character from the list
         victim = random.choice(self.characters)
         self.characters.remove(victim)  # Remove the killed character from the list
 
-        # Randomly select the killer from the shuffled list
+    # Randomly select the killer from the shuffled list
         killer = self.characters[0]
         weapon = self.weapons[0]
 
-        # Shuffle weapons and locations
+    # Shuffle weapons and locations
         random.shuffle(self.weapons)
         random.shuffle(self.locations)
 
-        storyline = f"{victim} is killed at the {self.locations[1]} and a {self.weapons[1]} is found beside him. "
+        storyline = f"{victim} is killed at the {self.locations[0]} and a {self.weapons[0]} is found beside him. "
         storyline += f"\nThe characters at that place:\n"
 
-        # Assign random actions and locations to other characters
+    # Assign random actions and locations to other characters
         for char, act, weap, loc, dist in zip(self.characters, self.actions, self.weapons[1:], self.locations[1:], self.distance[1:]):
             storyline += f"- {char} is {act} and bringing {weap} {dist} meters from the murder location in {loc}.\n"
 
         self.story_text.insert(tk.END, storyline)
 
-        # Set the correct answer after shuffling (move this line here)
-        self.correct_answer = f"The Killer: {killer}\nThe location: {self.locations[self.current_storyline]}\nThe weapon: {weapon}\n"
+    # Set the correct answer after shuffling (move this line here)
+        self.correct_answer = f"The Killer: {killer}\nThe location: {self.locations[0]}\nThe weapon: {weapon}\n"
+
 
     def show_clues(self):
         # Pass correct answers for each clue
@@ -144,13 +145,13 @@ class KlooDoGame:
 
     # Embed the correct answer into the grid horizontally
         for i, char in enumerate(correct_answer):
-            grid[start_row][start_col + i] = char
+            grid[start_row][start_col + i] = f'[ {char} ]'
 
     # Fill the remaining grid with random alphabets
         for row in range(grid_size[0]):
             for col in range(grid_size[1]):
                 if grid[row][col] == ' ':
-                    grid[row][col] = random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+                    grid[row][col] = f'[ {random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ")} ]'
 
     # Convert the grid to a string
         clue_text = '\n'.join([' '.join(row) for row in grid])
