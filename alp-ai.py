@@ -39,28 +39,28 @@ class KlooDoGame:
         self.update_score_display()
 
     def create_widgets(self):
-        self.story_label = tk.Label(self.master, text="Storyline", font=("Helvetica", 16, "bold"))
+        self.story_label = tk.Label(self.master, text="Storyline", font=("Helvetica", 16, "bold"), bg="lightblue")
         self.story_label.pack(pady=10)
 
-        self.story_text = tk.Text(self.master, height=8, width=80, wrap=tk.WORD, font=("Helvetica", 12))
+        self.story_text = tk.Text(self.master, height=8, width=80, wrap=tk.WORD, font=("Helvetica", 12), bg="lightyellow")
         self.story_text.pack(pady=10)
 
-        self.clue_button = tk.Button(self.master, text="Clue", command=self.show_clues, font=("Helvetica", 12))
+        self.clue_button = tk.Button(self.master, text="Clue", command=self.show_clues, font=("Helvetica", 12), bg="lightgreen")
         self.clue_button.pack(pady=5)
 
-        self.name_label = tk.Label(self.master, text="Your Guess - Name:", font=("Helvetica", 12))
+        self.name_label = tk.Label(self.master, text="Your Guess - Name:", font=("Helvetica", 12), bg="lightblue")
         self.name_label.pack()
 
         self.name_entry = tk.Entry(self.master, font=("Helvetica", 12))
         self.name_entry.pack(pady=5)
 
-        self.location_label = tk.Label(self.master, text="Your Guess - Location:", font=("Helvetica", 12))
+        self.location_label = tk.Label(self.master, text="Your Guess - Location:", font=("Helvetica", 12), bg="lightblue")
         self.location_label.pack()
 
         self.location_entry = tk.Entry(self.master, font=("Helvetica", 12))
         self.location_entry.pack(pady=5)
 
-        self.weapon_label = tk.Label(self.master, text="Your Guess - Weapon:", font=("Helvetica", 12))
+        self.weapon_label = tk.Label(self.master, text="Your Guess - Weapon:", font=("Helvetica", 12), bg="lightblue")
         self.weapon_label.pack()
 
         self.weapon_entry = tk.Entry(self.master, font=("Helvetica", 12))
@@ -68,11 +68,11 @@ class KlooDoGame:
 
         # Modify the 'Submit' button to use functools.partial
         self.submit_button = tk.Button(self.master, text="Submit", command=functools.partial(self.check_answer, True),
-                                       font=("Helvetica", 12, "bold"))
+                                       font=("Helvetica", 12, "bold"), bg="orange", fg="white")
         self.submit_button.pack(pady=10)
 
         self.score_label = tk.Label(self.master, text=f"User Score: {self.user_score} | System Score: {self.system_score}",
-                                    font=("Helvetica", 12, "italic"))
+                                    font=("Helvetica", 12, "italic"), bg="lightblue")
         self.score_label.pack(pady=10)
 
     def shuffle_characters(self):
@@ -240,8 +240,6 @@ class KlooDoGame:
     def update_score_display(self):
         self.score_label.config(text=f"User Score: {self.user_score} | System Score: {self.system_score}",
                                 font=("Helvetica", 12, "italic"))
-
-
 def main():
     root = tk.Tk()
     game = KlooDoGame(root)
