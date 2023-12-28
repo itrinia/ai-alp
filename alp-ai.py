@@ -117,6 +117,12 @@ class KlooDoGame:
     # Set the correct answer after shuffling (move this line here)
         self.correct_answer = f"The Killer: {killer}\nThe location: {self.locations[0]}\nThe weapon: {weapon}\n"
 
+    # Clear the entry fields for killer's name and location
+        self.name_entry.delete(0, tk.END)
+        self.location_entry.delete(0, tk.END)
+        self.weapon_entry.delete(0, tk.END)
+
+
 
     def show_clues(self):
         # Pass correct answers for each clue
