@@ -7,6 +7,7 @@ class KlooDoGame:
     def __init__(self, master):
         self.master = master
         self.master.title("Kloo-Do Game")
+        self.round_counter = 1
 
         # Set the initial window size
         self.master.geometry("800x500")
@@ -34,6 +35,7 @@ class KlooDoGame:
         self.generate_storyline()
         # Directly set the correct_answer attribute based on the current storyline
         self.correct_answer = f"The Killer: {self.characters[0]}\nThe location: {self.locations[self.current_storyline]}\nThe weapon: {self.weapons[0]}\n"
+        self.round_counter += 1
 
         # Update the score display initially
         self.update_score_display()
@@ -207,6 +209,10 @@ class KlooDoGame:
                 self.reset_game()
             elif is_submit:
                 messagebox.showinfo("Incorrect", "Sorry, your answer is incorrect. Keep investigating!")
+                
+    def update_score_display(self):
+        self.score_label.config(text=f"Round: {self.round_counter} | User Score: {self.user_score} | System Score: {self.system_score}", font=("Helvetica", 12, "italic"))
+
 
     def end_game(self):
         if self.user_score >= 3:
