@@ -10,7 +10,7 @@ class KlooDoGame:
         self.round_counter = 1
 
         # Set the initial window size
-        self.master.geometry("800x500")
+        self.master.geometry("800x600")
         # Allow both width and height to be resizable
         self.master.resizable(width=True, height=True)
 
@@ -22,6 +22,8 @@ class KlooDoGame:
 
         # Add the characters attribute
         self.characters = self.original_characters.copy()
+        self.weapons = self.original_weapons.copy()
+        self.locations = self.original_locations.copy()
         self.storyline_count = 1
         self.current_storyline = 0
         self.max_incorrect_guesses = 3
@@ -54,6 +56,11 @@ class KlooDoGame:
         self.update_score_display()
 
     def create_widgets(self):
+        self.user_score_label = tk.Label(self.master, text="User Score: 0", font=("Helvetica", 12, "italic"), bg="pink")
+        self.user_score_label.pack(pady=5)
+
+        self.system_score_label = tk.Label(self.master, text="System Score: 0", font=("Helvetica", 12, "italic"), bg="pink")
+        self.system_score_label.pack(pady=5)
         self.story_label = tk.Label(self.master, text="Storyline", font=("Helvetica", 16, "bold"), bg="lightblue")
         self.story_label.pack(pady=10)
 
@@ -63,19 +70,19 @@ class KlooDoGame:
         self.clue_button = tk.Button(self.master, text="Clue", command=self.show_clues, font=("Helvetica", 12), bg="lightgreen")
         self.clue_button.pack(pady=5)
 
-        self.name_label = tk.Label(self.master, text="Your Guess - Name:", font=("Helvetica", 12), bg="lightblue")
+        self.name_label = tk.Label(self.master, text="Guess killer's name:", font=("Helvetica", 12), bg="lightblue")
         self.name_label.pack()
 
         self.name_entry = tk.Entry(self.master, font=("Helvetica", 12))
         self.name_entry.pack(pady=5)
 
-        self.location_label = tk.Label(self.master, text="Your Guess - Location:", font=("Helvetica", 12), bg="lightblue")
+        self.location_label = tk.Label(self.master, text="Guess murder location:", font=("Helvetica", 12), bg="lightblue")
         self.location_label.pack()
 
         self.location_entry = tk.Entry(self.master, font=("Helvetica", 12))
         self.location_entry.pack(pady=5)
 
-        self.weapon_label = tk.Label(self.master, text="Your Guess - Weapon:", font=("Helvetica", 12), bg="lightblue")
+        self.weapon_label = tk.Label(self.master, text="Guess murder weapon:", font=("Helvetica", 12), bg="lightblue")
         self.weapon_label.pack()
 
         self.weapon_entry = tk.Entry(self.master, font=("Helvetica", 12))
@@ -85,9 +92,6 @@ class KlooDoGame:
         self.submit_button = tk.Button(self.master, text="Submit", command=functools.partial(self.check_answer, True),
                                        font=("Helvetica", 12, "bold"), bg="orange", fg="white")
         self.submit_button.pack(pady=10)
-
-        self.score_label = tk.Label(self.master, text=f"Round: {self.round_counter} | User Score: {self.user_score} | System Score: {self.system_score}", font=("Helvetica", 12, "italic"), bg="lightblue")
-        self.score_label.pack(pady=10)
 
     def shuffle_characters(self):
         random.shuffle(self.original_characters)
@@ -150,12 +154,12 @@ class KlooDoGame:
         start_col = random.randint(0, max_start_col)
 
         for i, char in enumerate(correct_answer):
-            grid[start_row][start_col + i] = f'[ {char} ]'
+            grid[start_row][start_col + i] = f'{char}'
 
         for row in range(grid_size[0]):
             for col in range(grid_size[1]):
                 if grid[row][col] == ' ':
-                    grid[row][col] = f'[ {random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ")} ]'
+                    grid[row][col] = f'{random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ")}'
 
         clue_text = '\n'.join([' '.join(row) for row in grid])
 
@@ -202,7 +206,8 @@ class KlooDoGame:
                 messagebox.showinfo("Incorrect", "Sorry, your answer is incorrect. Keep investigating!")
 
     def update_score_display(self):
-        self.score_label.config(text=f"Round: {self.round_counter} | User Score: {self.user_score} | System Score: {self.system_score}", font=("Helvetica", 12, "italic"))
+        self.user_score_label.config(text=f"User Score: {self.user_score}")
+        self.system_score_label.config(text=f"System Score: {self.system_score}")
 
     def end_game(self):
         if self.user_score >= 3:
