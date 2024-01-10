@@ -93,37 +93,43 @@ class KlooDoGame:
                                        font=("Helvetica", 12, "bold"), bg="orange", fg="white")
         self.submit_button.pack(pady=10)
 
+    def generate_order(self, original_list):
+    # Generate a deterministic order based on the original order
+        order = list(range(len(original_list)))
+        random.shuffle(order)  # You can replace this line with a deterministic shuffling logic if needed
+        return [original_list[i] for i in order]
+
     def shuffle_characters(self):
-        random.shuffle(self.original_characters)
-        random.shuffle(self.original_weapons)
-        random.shuffle(self.original_locations)
+        # Generate deterministic orders for characters, weapons, and locations
+        self.characters = self.generate_order(self.original_characters)
+        self.weapons = self.generate_order(self.original_weapons)
+        self.locations = self.generate_order(self.original_locations)
 
-        victim_index = self.original_characters.index(self.characters[0])
+        # Set the victim as the first character in the new order
+        victim_index = self.characters.index(self.original_characters[0])
 
-        random_position = random.randint(0, len(self.original_characters) - 1)
-        self.original_characters.insert(random_position, self.original_characters.pop(victim_index))
-
-        self.characters = self.original_characters.copy()
-        self.weapons = self.original_weapons.copy()
-        self.locations = self.original_locations.copy()
+        # Place the victim at a random position in the new order
+        random_position = random.randint(0, len(self.characters) - 1)
+        self.characters.insert(random_position, self.characters.pop(victim_index))
 
     def generate_storyline(self):
         self.story_text.delete(1.0, tk.END)
 
-        self.shuffle_characters()
-
-        victim = random.choice(self.characters)
+        # Use the characters list without shuffling
+        victim = self.characters[0]
         self.characters.remove(victim)
         killer = self.characters[0]
         weapon = self.weapons[0]
 
-        random.shuffle(self.weapons)
-        random.shuffle(self.locations)
-
         storyline = f"{victim} is killed at the {self.locations[0]} and a {self.weapons[0]} is found beside him. "
         storyline += f"\nThe characters at that place:\n"
 
-        for char, act, weap, loc, dist in zip(self.characters, self.actions, self.weapons[1:], self.locations[1:], self.distance[1:]):
+        # Initialize variables for current weapon, location, and distance
+        current_weapon = self.weapons[1:]
+        current_location = self.locations[1:]
+        current_distance = self.distance[1:]
+
+        for char, act, weap, loc, dist in zip(self.characters, self.actions, current_weapon, current_location, current_distance):
             storyline += f"- {char} is {act} and bringing {weap} {dist} meters from the murder location in {loc}.\n"
 
         self.story_text.insert(tk.END, storyline)
@@ -147,15 +153,15 @@ class KlooDoGame:
         grid_size = (10, 10)
         grid = [[' ' for _ in range(grid_size[1])] for _ in range(grid_size[0])]
 
-        max_start_row = max(0, grid_size[0] - len(correct_answer))
-        start_row = random.randint(0, max_start_row)
+        # Determine the starting position based on the length of the correct answer
+        start_row = grid_size[0] // 2
+        start_col = (grid_size[1] - len(correct_answer)) // 2
 
-        max_start_col = max(0, grid_size[1] - len(correct_answer))
-        start_col = random.randint(0, max_start_col)
-
+        # Embed the correct answer into the grid horizontally
         for i, char in enumerate(correct_answer):
             grid[start_row][start_col + i] = f'{char}'
 
+        # Fill the remaining grid with random alphabets
         for row in range(grid_size[0]):
             for col in range(grid_size[1]):
                 if grid[row][col] == ' ':
@@ -164,6 +170,7 @@ class KlooDoGame:
         clue_text = '\n'.join([' '.join(row) for row in grid])
 
         return clue_text
+
 
     def check_answer(self, is_submit):
         name_guess = self.name_entry.get().lower()
