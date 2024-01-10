@@ -10,7 +10,7 @@ class KlooDoGame:
         self.round_counter = 1
 
         # Set the initial window size
-        self.master.geometry("800x500")
+        self.master.geometry("800x600")
         # Allow both width and height to be resizable
         self.master.resizable(width=True, height=True)
 
@@ -20,14 +20,29 @@ class KlooDoGame:
         self.actions = ["Massaging", "Party", "Sleeping", "Sweeping", "Singing"]
         self.distance = ["10", "500", "3", "100", "20"]
 
-        # Add the characters attribute
+                # Add the characters attribute
         self.characters = self.original_characters.copy()
+        self.weapons = self.original_weapons.copy()
+        self.locations = self.original_locations.copy()
         self.storyline_count = 1
         self.current_storyline = 0
         self.max_incorrect_guesses = 3
         self.incorrect_guesses = 0
         self.user_score = 0
         self.system_score = 0
+
+        # Create knowledge base using First Order Logic
+        self.knowledge_base = []
+        for character in self.original_characters:
+            for location in self.original_locations:
+                for weapon in self.original_weapons:
+                    knowledge = {
+                        "character": character,
+                        "location": location,
+                        "weapon": weapon,
+                        "sentence": f"The Killer: {character}\nThe location: {location}\nThe weapon: {weapon}\n"
+                    }
+                    self.knowledge_base.append(knowledge)
 
         self.create_widgets()
 
