@@ -189,13 +189,13 @@ class KlooDoGame:
 
     # Embed the correct answer into the grid horizontally
         for i, char in enumerate(correct_answer):
-            grid[start_row][start_col + i] = f'[ {char} ]'
+            grid[start_row][start_col + i] = f' {char} '
 
     # Fill the remaining grid with random alphabets
         for row in range(grid_size[0]):
             for col in range(grid_size[1]):
                 if grid[row][col] == ' ':
-                    grid[row][col] = f'[ {random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ")} ]'
+                    grid[row][col] = f' {random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ")} '
 
     # Convert the grid to a string
         clue_text = '\n'.join([' '.join(row) for row in grid])
