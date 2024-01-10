@@ -45,6 +45,18 @@ class KlooDoGame:
                     self.knowledge_base.append(knowledge)
 
         self.create_widgets()
+        
+        # old code
+        # # Add the characters attribute
+        # self.characters = self.original_characters.copy()
+        # self.storyline_count = 1
+        # self.current_storyline = 0
+        # self.max_incorrect_guesses = 3
+        # self.incorrect_guesses = 0
+        # self.user_score = 0
+        # self.system_score = 0
+
+        # self.create_widgets()
 
         # Generate the first storyline and clues
         self.generate_storyline()
@@ -148,7 +160,7 @@ class KlooDoGame:
         self.weapon_entry.delete(0, tk.END)
 
 
-
+# -------STORYLINE---------
 
     def show_clues(self):
         # Pass correct answers for each clue
