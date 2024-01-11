@@ -154,23 +154,26 @@ class KlooDoGame:
         grid = [[' ' for _ in range(grid_size[1])] for _ in range(grid_size[0])]
 
         # Determine the starting position based on the length of the correct answer
-        start_row = grid_size[0] // 2
-        start_col = (grid_size[1] - len(correct_answer)) // 2
+        start_row = random.randint(0, grid_size[0] - 1)
+        start_col = random.randint(0, grid_size[1] - len(correct_answer))
 
-        # Embed the correct answer into the grid horizontally
+        # Embed the correct answer into the grid based on a rule (show only consonants)
+        consonants = "BCDFGHJKLMNPQRSTVWXYZ"
         for i, char in enumerate(correct_answer):
-            grid[start_row][start_col + i] = f'{char}'
+            if char in consonants:
+                grid[start_row][start_col + i] = f'{char}'
 
-        # Fill the remaining grid with random alphabets
+        # Fill the remaining grid with random vowels or spaces
+        vowels = "AEIOU"
         for row in range(grid_size[0]):
             for col in range(grid_size[1]):
                 if grid[row][col] == ' ':
-                    grid[row][col] = f'{random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ")}'
+                    # Use '_' to represent empty spaces in the crossword
+                    grid[row][col] = f'{random.choice(vowels)}'
 
         clue_text = '\n'.join([' '.join(row) for row in grid])
 
         return clue_text
-
 
     def check_answer(self, is_submit):
         name_guess = self.name_entry.get().lower()
