@@ -115,10 +115,16 @@ class KlooDoGame:
     def generate_storyline(self):
         self.story_text.delete(1.0, tk.END)
 
+        # Shuffle the characters list
+        random.shuffle(self.characters)
+
         # Use the characters list without shuffling
         victim = self.characters[0]
-        self.characters.remove(victim)
-        killer = self.characters[0]
+
+        # Ensure that the killer is not the same as the victim
+        potential_killers = [char for char in self.characters[1:] if char != victim]
+        killer = random.choice(potential_killers)
+
         weapon = self.weapons[0]
 
         storyline = f"{victim} is killed at the {self.locations[0]} and a {self.weapons[0]} is found beside him. "
@@ -129,16 +135,17 @@ class KlooDoGame:
         current_location = self.locations[1:]
         current_distance = self.distance[1:]
 
-        for char, act, weap, loc, dist in zip(self.characters, self.actions, current_weapon, current_location, current_distance):
+        for char, act, weap, loc, dist in zip(self.characters[1:], self.actions, current_weapon, current_location, current_distance):
             storyline += f"- {char} is {act} and bringing {weap} {dist} meters from the murder location in {loc}.\n"
 
         self.story_text.insert(tk.END, storyline)
 
-        self.correct_answer = f"The Killer: {killer}\nThe location: {self.locations[0]}\nThe weapon: {weapon}\n"
+        self.correct_answer = f"The Killer: {killer}\nThe location: {self.locations[self.current_storyline]}\nThe weapon: {self.weapons[0]}\n"
 
         self.name_entry.delete(0, tk.END)
         self.location_entry.delete(0, tk.END)
         self.weapon_entry.delete(0, tk.END)
+
 
     def show_clues(self):
         actor_clue = self.generate_clue(self.characters[0])
@@ -185,8 +192,8 @@ class KlooDoGame:
             return
 
         if name_guess == self.characters[0].lower() and \
-                location_guess == self.locations[self.current_storyline].lower() and \
-                weapon_guess == self.weapons[0].lower():
+            location_guess == self.locations[self.current_storyline].lower() and \
+            weapon_guess == self.weapons[0].lower():
             self.user_score += 1
             self.update_score_display()
             messagebox.showinfo("Correct", "Congratulations! You solved the mystery. You got 1 score!")
