@@ -48,6 +48,7 @@ class KlooDoGame:
 
         # Generate the first storyline and clues
         self.generate_storyline()
+        
         # Directly set the correct_answer attribute based on the current storyline
         self.correct_answer = f"The Killer: {self.characters[0]}\nThe location: {self.locations[self.current_storyline]}\nThe weapon: {self.weapons[0]}\n"
         self.round_counter += 1
@@ -115,19 +116,23 @@ class KlooDoGame:
     def generate_storyline(self):
         self.story_text.delete(1.0, tk.END)
 
-        # Shuffle the characters list
-        random.shuffle(self.characters)
-
         # Use the characters list without shuffling
         victim = self.characters[0]
 
         # Ensure that the killer is not the same as the victim
-        potential_killers = [char for char in self.characters[1:] if char != victim]
+        potential_killers = [char for char in self.characters if char != victim]
         killer = random.choice(potential_killers)
 
-        weapon = self.weapons[0]
+        # Swap the victim and killer in the characters list
+        victim_index = self.characters.index(victim)
+        killer_index = self.characters.index(killer)
+        self.characters[victim_index], self.characters[killer_index] = self.characters[killer_index], self.characters[victim_index]
 
-        storyline = f"{victim} is killed at the {self.locations[0]} and a {self.weapons[0]} is found beside him. "
+        # Select a random location and weapon
+        location = random.choice(self.locations)
+        weapon = random.choice(self.weapons)
+
+        storyline = f"{victim} is killed at the {location} and a {weapon} is found beside him. "
         storyline += f"\nThe characters at that place:\n"
 
         # Initialize variables for current weapon, location, and distance
@@ -135,17 +140,20 @@ class KlooDoGame:
         current_location = self.locations[1:]
         current_distance = self.distance[1:]
 
-        for char, act, weap, loc, dist in zip(self.characters[1:], self.actions, current_weapon, current_location, current_distance):
+        # Create a list of characters excluding the victim
+        characters_at_scene = [char for char in self.characters if char != victim]
+
+        for char, act, weap, loc, dist in zip(characters_at_scene, self.actions, current_weapon, current_location, current_distance):
             storyline += f"- {char} is {act} and bringing {weap} {dist} meters from the murder location in {loc}.\n"
 
         self.story_text.insert(tk.END, storyline)
 
-        self.correct_answer = f"The Killer: {killer}\nThe location: {self.locations[self.current_storyline]}\nThe weapon: {self.weapons[0]}\n"
+        self.correct_answer = f"The Killer: {killer}\nThe location: {location}\nThe weapon: {weapon}\n"
 
         self.name_entry.delete(0, tk.END)
         self.location_entry.delete(0, tk.END)
         self.weapon_entry.delete(0, tk.END)
-
+        self.current_storyline += 1
 
     def show_clues(self):
         actor_clue = self.generate_clue(self.characters[0])
@@ -160,22 +168,18 @@ class KlooDoGame:
         grid_size = (10, 10)
         grid = [[' ' for _ in range(grid_size[1])] for _ in range(grid_size[0])]
 
-        # Determine the starting position based on the length of the correct answer
         start_row = random.randint(0, grid_size[0] - 1)
         start_col = random.randint(0, grid_size[1] - len(correct_answer))
 
-        # Embed the correct answer into the grid based on a rule (show only consonants)
         consonants = "BCDFGHJKLMNPQRSTVWXYZ"
         for i, char in enumerate(correct_answer):
             if char in consonants:
                 grid[start_row][start_col + i] = f'{char}'
 
-        # Fill the remaining grid with random vowels or spaces
         vowels = "AEIOU"
         for row in range(grid_size[0]):
             for col in range(grid_size[1]):
                 if grid[row][col] == ' ':
-                    # Use '_' to represent empty spaces in the crossword
                     grid[row][col] = f'{random.choice(vowels)}'
 
         clue_text = '\n'.join([' '.join(row) for row in grid])
