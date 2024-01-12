@@ -97,7 +97,7 @@ class KlooDoGame:
     def generate_order(self, original_list):
     # Generate a deterministic order based on the original order
         order = list(range(len(original_list)))
-        random.shuffle(order)  # You can replace this line with a deterministic shuffling logic if needed
+        random.shuffle(order)
         return [original_list[i] for i in order]
 
     def shuffle_characters(self):
